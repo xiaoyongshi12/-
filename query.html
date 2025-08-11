@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>移动端信息查询</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 移动端样式 */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loadingStatus" class="status warning">
+            <div class="loading"></div> 正在加载数据，请稍候...
+        </div>
+        
+        <div id="queryInterface" style="display: none;">
+            <!-- 查询界面 -->
+        </div>
+    </div>
+
+    <script>
+        // 从URL参数获取压缩数据
+        const urlParams = new URLSearchParams(window.location.search);
+        const compressedData = urlParams.get('data');
+        
+        if (compressedData) {
+            try {
+                // 解压数据
+                const jsonStr = LZString.decompressFromEncodedURIComponent(compressedData);
+                const data = JSON.parse(jsonStr);
+                
+                // 存储到localStorage
+                localStorage.setItem('excelHeaders', JSON.stringify(data.headers));
+                localStorage.setItem('excelData', JSON.stringify(data.excelData));
+                
+                // 显示查询界面
+                document.getElementById('loadingStatus').innerHTML = 
+                    '<div class="status success"><i class="fas fa-check-circle"></i> 数据加载成功</div>';
+                
+                setTimeout(() => {
+                    document.getElementById('loadingStatus').style.display = 'none';
+                    document.getElementById('queryInterface').style.display = 'block';
+                    // 初始化查询界面
+                }, 1500);
+                
+            } catch (error) {
+                document.getElementById('loadingStatus').innerHTML = 
+                    '<div class="status error">数据加载失败，请重新扫描二维码</div>';
+            }
+        } else {
+            document.getElementById('loadingStatus').innerHTML = 
+                '<div class="status error">未找到数据，请重新扫描二维码</div>';
+        }
+    </script>
+</body>
+</html>
